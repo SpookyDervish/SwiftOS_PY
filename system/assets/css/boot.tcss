@@ -1,0 +1,38 @@
+#boot_log {
+    scrollbar-size-horizontal: 0;
+}
+
+#login_form {
+    align: center middle;
+}
+
+#login_form Container {
+    max-width: 35%;
+    max-height: 75%;
+    padding: 1;
+    border: heavy $primary;
+    border-title-align: left;
+}
+
+#login-password {
+    max-width: 50%;
+    text-align: center;
+    margin: 3;
+    min-height: 30%;
+    margin: 2 0;
+}
+
+#password-container {
+    max-height: 30%;
+}
+
+#sign-in {
+    content-align: center middle;
+    layout: horizontal;
+}
+
+#sign-in Button {
+    margin: 0 3;
+
+    min-width: 30%;
+}

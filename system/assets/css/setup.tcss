@@ -1,0 +1,68 @@
+Screen {
+    
+}
+
+.center {
+    content-align: center middle;
+    min-width: 100%;
+}
+
+#next-button {
+    dock: bottom;
+    margin: 1;
+}
+
+.container {
+    layout: horizontal;
+}
+
+#info {
+    max-width: 50%;
+}
+
+#setup-form {
+    max-width: 50%;
+    background: $boost;
+    align: center middle;
+}
+
+#setup-form Input {
+    max-width: 50%;
+    margin: 1;
+}
+
+#image-grid {
+    layout: grid;
+    grid-rows: 1fr;
+    grid-columns: 1fr;
+    grid-size: 3 1;
+    grid-gutter: 1;
+
+    min-height: 1.5fr;
+}
+
+#theme-grid {
+    layout: grid;
+    grid-size: 2 1;
+}
+
+.image-container {
+    background: $background;
+    padding: 1;
+}
+
+.image-container Static {
+    min-width: 100%;
+    content-align: center middle;
+}
+
+.image-container Button {
+    width: 1fr;
+    margin: 1;
+}
+
+.title {
+    margin: 1;
+    min-width: 100%;
+    text-align: center;
+}
