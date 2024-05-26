@@ -181,7 +181,7 @@ Press **"Finish"** to end Setup.
     
     def on_input_changed(self, event: Input.Changed):
         """
-        When the user types a key inside of a text input.
+        Fires when the user types a key inside of a text input.
         
         ! This is used internally by Textual, do not use this in the rest of the OS.
 
@@ -191,52 +191,44 @@ Press **"Finish"** to end Setup.
         
         status = self.query_one("#status")
         self.can_continue = False
-        
-        is_error = False
-        
-        #FIXME: WHAT THE HELL IS THIS MADNESS, THE SHEER AMOUNT OF NESTED IF STATEMENTS IS DISGUSTING
-        if not event.validation_result.is_valid:
-            is_error = True
-            status.update(f"[bold red]{event.validation_result.failure_descriptions[0]}[/bold red]")
-        
-        if self.query_one("#password-input").value.strip() == "" or \
-            self.query_one("#confirm-password-input").value.strip() == "":
-                is_error = True
-                status.update("[bold red]You can't have an empty password![/bold red]")
-                
-        if self.query_one("#username-input").value.strip() == "":
-                is_error = True
-                status.update("[bold red]You can't have an empty username![/bold red]")
-        
-        if event.input.id == "confirm-password-input":
-            if event.input.value != self.query_one("#password-input").value:
-                is_error = True
-                status.update("[bold red]Passwords do not match![/bold red]")
-        elif event.input.id == "password-input":
-            if event.input.value != self.query_one("#confirm-password-input").value:
-                is_error = True
-                status.update("[bold red]Passwords do not match![/bold red]")
-                
-        if user_exists(self.query_one("#username-input").value):
-            is_error = True
-            status.update("[bold red]That username is taken![/bold red]")
 
-        if not is_error: # We can finally continue after we made it through the programming attrocities above :D
+        def set_error(message):
+            nonlocal is_error
+            is_error = True
+            status.update(f"[bold red]{message}[/bold red]")
+
+        self.app.log(not event.validation_result.is_valid and len(event.validation_result.failure_descriptions) > 0)
+        validations = {
+            "validation_result": lambda: ( not event.validation_result.is_valid,
+                                    event.validation_result.failure_descriptions),
+            "empty_password": lambda: (self.query_one("#password-input").value.strip() == "" or 
+                                    self.query_one("#confirm-password-input").value.strip() == "",
+                                    ["You can't have an empty password!"]),
+            "empty_username": lambda: (self.query_one("#username-input").value.strip() == "",
+                                    ["You can't have an empty username!"]),
+            "password_mismatch": lambda: (event.input.id in ["confirm-password-input", "password-input"] and 
+                                        event.input.value != self.query_one("#confirm-password-input" if event.input.id == "password-input" else "#password-input").value,
+                                        ["Passwords do not match!"]),
+            "username_taken": lambda: (user_exists(self.query_one("#username-input").value),
+                                    ["That username is taken!"])
+        }
+
+        is_error = False
+
+        for _, validation in validations.items():
+            condition, message = validation()
+            if condition and len(message) > 0:
+                set_error(message[0])
+                break
+
+        if not is_error:
             status.update("")
             self.can_continue = True
-        else:
-            self.can_continue = False
-            
-            
+
         tabbed_content = self.query_one(TabbedContent)
-            
-        next_tab_str = f"tab-{self.CURRENT_TAB+1}"
+        next_tab_str = f"tab-{self.CURRENT_TAB + 1}"
         next_tab = tabbed_content.get_tab(next_tab_str)
-        
-        if self.can_continue:
-            next_tab.disabled = False
-        else:
-            next_tab.disabled = True
+        next_tab.disabled = not self.can_continue
         self.can_continue = False
     
     def compose(self) -> ComposeResult:

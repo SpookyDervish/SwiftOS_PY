@@ -102,7 +102,7 @@ class Desktop(Screen):
         self.select_window(selected_window)
         
         if selected_window.is_minimized:
-            selected_window.normal_size_animation(selected_window.position)
+            selected_window.normal_size_animation()
 
     def select_window(self, selected_window) -> None:
         """Give a visual indicator a window is selected.
