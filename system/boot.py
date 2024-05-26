@@ -19,7 +19,9 @@ from main import SwiftOS
 
 
 def on_ready(desktop: desktop_screen.Desktop) -> ComposeResult:
-    yield window.Window(Static("Hello, World!"), title="Test Window")
+    yield window.Window(Static("Hello, World!"), title="Test Window 1")
+    yield window.Window(Static("Hello, World!"), title="Test Window 2")
+    yield window.Window(Static("Hello, World!"), title="Test Window 3")
 
 @work
 async def boot(app : SwiftOS, ini_path: str):
