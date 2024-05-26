@@ -120,6 +120,8 @@ class Desktop(Screen):
         window_bar: TabbedContent = self.query_one("#window-bar")
         window_bar.active = self.window_title_to_id(selected_window.title)
         
+        self.windows.move_child(selected_window, after=-1)
+        
         self.app.log(f"Window Selected ({self}): {selected_window.id}")
     
     def window_title_to_id(self, title: str):

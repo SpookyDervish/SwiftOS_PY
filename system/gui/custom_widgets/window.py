@@ -154,9 +154,6 @@ class Window(Vertical):
         """Handle when the left mouse button begins to be held on the window."""
         self.is_dragging = True
         
-        if isinstance(self.parent, Widget):
-            self.parent.move_child(self, after=-1)
-        
         self.screen.select_window(self)
     
     def on_mouse_up(self):
