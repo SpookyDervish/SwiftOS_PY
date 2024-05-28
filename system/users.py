@@ -88,7 +88,9 @@ def create_user(username: str, password: str, admin: bool = False, background: s
     if os.path.isdir(f"home/{username}"):
         raise UserAlreadyExistsError(username)
     
-    os.mkdir(f"home/{username}")
+    user_dir = f"home/{username}"
+    
+    os.mkdir(user_dir)
     
     user_json = open(f"home/{username}/user.json", "x")
     json.dump(
@@ -105,6 +107,13 @@ def create_user(username: str, password: str, admin: bool = False, background: s
         user_json
     )
     user_json.close()
+    
+    os.mkdir(f"{user_dir}/Desktop")
+    os.mkdir(f"{user_dir}/Documents")
+    os.mkdir(f"{user_dir}/Downloads")
+    os.mkdir(f"{user_dir}/Videos")
+    os.mkdir(f"{user_dir}/Pictures")
+    os.mkdir(f"{user_dir}/Music")
     
     return True
     
