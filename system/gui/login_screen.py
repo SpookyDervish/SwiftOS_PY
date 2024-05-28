@@ -68,6 +68,18 @@ class LoginForm(ModalScreen):
                 yield Button("Sign In", variant="success", id="sign-in-button")
                 yield Button("Change User", id="change-user")
     
+    def on_input_submitted(self, event: Input.Submitted):
+        """Fires when the user submits an input widget.
+        
+        ! This is used internally by Textual, do not use it in the rest of the OS.
+
+        Args:
+            event (Input.Submitted): The event passed by Textual.
+        """
+        if event.input.id == "login-password":
+            # When the user submits their password, we attempt a sign in.
+            self.sign_in()
+    
     def sign_in(self):
         """
         Use the entered password in the login form to attempt to sign in.

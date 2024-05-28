@@ -12,9 +12,9 @@ from system.console import console_bounds
 
 
 class Desktop(Screen):
-    DEFAULT_CSS = """
+    DEFAULT_CSS = """    
     #windows {
-        background: $background-lighten-1;
+        background: black;
     }
     
     #windows Image {
@@ -26,6 +26,7 @@ class Desktop(Screen):
         margin-top: 1;
         layout: horizontal;
         max-height: 3;
+        visibility: hidden;
     }
     
     
@@ -41,6 +42,8 @@ class Desktop(Screen):
         super().__init__()
         
         self.logged_in_user = logged_in_user
+        self.selected_window = None
+        
         self.__mouse_pos = (0, 0)
         
     def remove_window(self, removed_window) -> None:
@@ -122,6 +125,7 @@ class Desktop(Screen):
         
         self.windows.move_child(selected_window, after=-1)
         
+        self.selected_window = selected_window
         self.app.log(f"Window Selected ({self}): {selected_window.id}")
     
     def window_title_to_id(self, title: str):
@@ -153,6 +157,10 @@ class Desktop(Screen):
         window_bar: TabbedContent = self.query_one("#window-bar")
         window_bar.remove_pane(win_id)
         
+        # This basically checks if the selected_window is self.selected_window,
+        # if they're the same self.selected_window is set to None.
+        self.selected_window = None if self.selected_window == selected_window else self.selected_window 
+        
         self.app.log(f"Window Deselected ({self}): {selected_window.id}")
     
     def on_ready(self) -> ComposeResult:
@@ -178,15 +186,17 @@ class Desktop(Screen):
         window_bar_windows = ["Desktop"]
         
         with self.windows:
-            yield image.Image(get_user_background(self.logged_in_user), (bounds.columns, (bounds.lines*2)-11), id="desktop-background")
+            #yield image.Image(get_user_background(self.logged_in_user), (bounds.columns, (bounds.lines*2)-11), id="desktop-background")
             
-            for widget in self.on_ready(self):
-                self.app.log(str(widget))
-                yield widget
-                
-                if isinstance(widget, window.Window):
-                    window_bar_windows.append(widget.title)
-                    self.app.log(f"Window Added to Desktop ({self}): ID={widget.id}")
+            ready_result = self.on_ready(self)
+            if ready_result:
+                for widget in ready_result:
+                    self.app.log(str(widget))
+                    yield widget
+                    
+                    if isinstance(widget, window.Window):
+                        window_bar_windows.append(widget.title)
+                        self.app.log(f"Window Added to Desktop ({self}): ID={widget.id}")
         
         with TabbedContent(id="window-bar") as tabs:
             for title in window_bar_windows:

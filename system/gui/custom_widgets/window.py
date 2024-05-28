@@ -52,6 +52,7 @@ class Window(Vertical):
         title: str,
         size: list[int] | None = None,
         start_position: list[int] | None = None,
+        no_title_bar: bool = False,
         name: str | None = None,
         id: str | None = None,
         classes: str | None = None,
@@ -63,6 +64,7 @@ class Window(Vertical):
             title (str): The title displayed on the window's title bar.
             size (list[int] | None, optional): How many characters wide and tall the window is. Defaults to 50x12.
             start_position (list[int] | None, optional): The position of the window when it's first created. Defaults to the center of the screen.
+            no_title_bar (bool, optional): If true, the window will have no title bar.
             name (str | None, optional): The name of the widget. Defaults to None.
             id (str | None, optional): The id of the widget in the DOM. Defaults to None.
             classes (str | None, optional): The CSS classes for the widget. Defaults to None.
@@ -75,6 +77,7 @@ class Window(Vertical):
         self._title = title
         
         self.window_running = True
+        self.no_title_bar = no_title_bar
         
         self.title = title
         self.id = self.id if id is not None else generate_random_string(5)
@@ -96,7 +99,11 @@ class Window(Vertical):
         self.is_dragging = False
         
         self.styles.width = self.window_size[0]
-        self.styles.height = self.window_size[1]+1 # We need to add one to make to space for the title bar
+        
+        if not self.no_title_bar:
+            self.styles.height = self.window_size[1]+1 # We need to add one to make to space for the title bar
+        else:
+            self.styles.height = self.window_size[1]
         
         self.window_container: Container = self.parent
         
@@ -108,20 +115,22 @@ class Window(Vertical):
         """        
         self.focus()
         
-        title_bar = self.query_one("#title-bar")
-        title_bar_buttons = title_bar.query_one("#title-bar-buttons")
-        
-        title_bar.styles.background = "cornflowerblue"
-        title_bar_buttons.styles.background = "cornflowerblue"
+        if not self.no_title_bar:
+            title_bar = self.query_one("#title-bar")
+            title_bar_buttons = title_bar.query_one("#title-bar-buttons")
+            
+            title_bar.styles.background = "cornflowerblue"
+            title_bar_buttons.styles.background = "cornflowerblue"
     
     def set_as_secondary(self):
         """Set this window as the non-selected window.
         """
-        title_bar = self.query_one("#title-bar")
-        title_bar_buttons = title_bar.query_one("#title-bar-buttons")
-        
-        title_bar.styles.background = "grey"
-        title_bar_buttons.styles.background = "grey"
+        if not self.no_title_bar:
+            title_bar = self.query_one("#title-bar")
+            title_bar_buttons = title_bar.query_one("#title-bar-buttons")
+            
+            title_bar.styles.background = "grey"
+            title_bar_buttons.styles.background = "grey"
     
     def set_title(self, new_title: str):
         """Sets the window's title.
@@ -133,12 +142,16 @@ class Window(Vertical):
             str: The old window title.
         """
         
-        title_bar = self.query_one("#title-bar")
-        title_text = title_bar.query_one("#title")
+        self._title = new_title
+        self.title = new_title
         
-        old_text = title_text.renderable.plain
-        
-        title_text.update(f" [bold]{new_title}[/bold]")
+        if not self.no_title_bar:
+            title_bar = self.query_one("#title-bar")
+            title_text = title_bar.query_one("#title")
+            
+            old_text = title_text.renderable.plain
+            
+            title_text.update(f" [bold]{new_title}[/bold]")
         
         return old_text
     
@@ -174,7 +187,9 @@ class Window(Vertical):
         
         if self.is_maximised == False:
             x1, y1 = (self.position[0], self.position[1])
-            x2, y2 = (self.position[0] + self.window_size[0], self.position[1] + self.window_size[1] + 4)
+            
+            padding = 4 if not self.no_title_bar else 3
+            x2, y2 = (self.position[0] + self.window_size[0], self.position[1] + self.window_size[1] + padding)
             
             if x >= x1 and x <= x2 and y >= y1 and y <= y2:
                 return True
@@ -238,7 +253,11 @@ class Window(Vertical):
             
             if self.is_maximised:
                 self.styles.width = self.window_size[0]
-                self.styles.height = self.window_size[1]
+                
+                if not self.no_title_bar:
+                    self.styles.height = self.window_size[1] + 1
+                else:
+                    self.styles.height = self.window_size[1]
                 
                 self.position = [
                     event.screen_x - self.window_size[0]/2,
@@ -353,8 +372,8 @@ class Window(Vertical):
     
     def compose(self) -> ComposeResult:
         """
-        Compose the window
-        
+        Compose the window.
+
         ! This is used internally by Textual, do not use this in the rest of the OS.
         """
         
@@ -368,12 +387,13 @@ class Window(Vertical):
         
         
         
-        with Container(id="title-bar"):
-            yield Static(f" [bold]{self.title}[/bold]", id="title")
-            
-            with Container(id="title-bar-buttons"):
-                yield Button("X", variant="error", id="close", classes="title-button")
-                yield Button("O", variant="warning", id="minimize", classes="title-button")
-                yield Button("█", variant="success", id="maximize", classes="title-button")
+        if not self.no_title_bar:
+            with Container(id="title-bar"):
+                yield Static(f" [bold]{self.title}[/bold]", id="title")
+                
+                with Container(id="title-bar-buttons"):
+                    yield Button("X", variant="error", id="close", classes="title-button")
+                    yield Button("O", variant="warning", id="minimize", classes="title-button")
+                    yield Button("█", variant="success", id="maximize", classes="title-button")
         
         self.app.log(f"Created window: {self.title}")

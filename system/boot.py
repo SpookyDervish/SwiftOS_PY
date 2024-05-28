@@ -8,7 +8,7 @@ from textual.widgets import Static, Footer
 
 from configparser import ConfigParser
 
-from system.gui.custom_widgets import image, window
+from system.gui.custom_widgets import image, icon
 
 from system.gui import loading_screen
 from system.gui import login_screen
@@ -19,9 +19,7 @@ from main import SwiftOS
 
 
 def on_ready(desktop: desktop_screen.Desktop) -> ComposeResult:
-    yield window.Window(Static("Hello, World!"), title="Test Window 1")
-    yield window.Window(Static("Hello, World!"), title="Test Window 2")
-    yield window.Window(Static("Hello, World!"), title="Test Window 3")
+    pass
 
 @work
 async def boot(app : SwiftOS, ini_path: str):
@@ -56,7 +54,7 @@ async def boot(app : SwiftOS, ini_path: str):
         del setup
     
     
-    app.log("Showing login screen..")
+    """app.log("Showing login screen..")
     
     login = login_screen.LoginScreen()
     login_form = login_screen.LoginForm(login)
@@ -67,7 +65,8 @@ async def boot(app : SwiftOS, ini_path: str):
     app.bell() # We're loaded!
     
     logged_in_user = await app.push_screen_wait(login_form)
-    app.log(f"Login completed! Logged in user: \"{logged_in_user}\"")
+    app.log(f"Login completed! Logged in user: \"{logged_in_user}\"")"""
+    logged_in_user = "Nathaniel"
     
     app.log("Loading desktop..")
     desktop = desktop_screen.Desktop(logged_in_user)
@@ -78,11 +77,11 @@ async def boot(app : SwiftOS, ini_path: str):
 
     app.log("Cleaning up..")
     
-    await login_form.remove()
-    await login.remove()
+    #await login_form.remove()
+    #await login.remove()
     await loading.remove()
     
-    del login_form
-    del login
+    #del login_form
+    #del login
     del loading
     
