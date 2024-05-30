@@ -19,7 +19,7 @@ from main import SwiftOS
 
 
 def on_ready(desktop: desktop_screen.Desktop) -> ComposeResult:
-    yield dialog.Dialog(message="This is a test message box!")
+    yield dialog.Dialog(message="This is a test message box!", icon=dialog.DialogIcon.EXCLAMATION)
     yield window.Window(title="Test Window")
 
 @work

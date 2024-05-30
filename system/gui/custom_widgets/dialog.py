@@ -87,10 +87,10 @@ class Dialog(Window):
             raise InvalidButtonsId(f"Invalid DialogButtons id: ", self.buttons)
         
         icons = {
-            DialogIcon.INFO:        "system/assets/images/icons/dialog/help.png",
+            DialogIcon.INFO:        "system/assets/images/icons/dialog/info.png",
             DialogIcon.QUESTION:    "system/assets/images/icons/dialog/help.png",
-            DialogIcon.EXCLAMATION: "system/assets/images/icons/dialog/help.png",
-            DialogIcon.CRITICAL:    "system/assets/images/icons/dialog/help.png",
+            DialogIcon.EXCLAMATION: "system/assets/images/icons/dialog/caution.png",
+            DialogIcon.CRITICAL:    "system/assets/images/icons/dialog/error.png",
         }
         self._icon_path = icons[self.icon]
         
