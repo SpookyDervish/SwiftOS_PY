@@ -8,7 +8,7 @@ from textual.widgets import Static, Footer
 
 from configparser import ConfigParser
 
-from system.gui.custom_widgets import image, icon
+from system.gui.custom_widgets import image, icon, window, dialog
 
 from system.gui import loading_screen
 from system.gui import login_screen
@@ -19,7 +19,8 @@ from main import SwiftOS
 
 
 def on_ready(desktop: desktop_screen.Desktop) -> ComposeResult:
-    pass
+    yield dialog.Dialog(message="This is a test message box!")
+    yield window.Window(title="Test Window")
 
 @work
 async def boot(app : SwiftOS, ini_path: str):

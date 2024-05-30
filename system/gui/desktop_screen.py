@@ -1,3 +1,5 @@
+import os
+
 from textual.screen import Screen
 from textual.app import ComposeResult
 from textual.widgets import Header, Footer, Static, TabbedContent, TabPane
@@ -6,27 +8,27 @@ from textual import events, on
 
 from string import punctuation
 
-from system.gui.custom_widgets import image, window
+from system.gui.custom_widgets import image, window, icon
 from system.users import get_user_background
+from system.fs import get_file_icon
 from system.console import console_bounds
 
 
 class Desktop(Screen):
     DEFAULT_CSS = """    
     #windows {
-        background: black;
+        background: $background-lighten-1;
     }
     
-    #windows Image {
+    #windows Image, #windows Icon {
         dock: top;
     }
     
     #window-bar {
         dock: top;
-        margin-top: 1;
         layout: horizontal;
         max-height: 3;
-        visibility: hidden;
+        margin-top: 1;
     }
     
     
@@ -184,14 +186,18 @@ class Desktop(Screen):
         self.windows = Container(id="windows")
         
         window_bar_windows = ["Desktop"]
-        
-        with self.windows:
-            #yield image.Image(get_user_background(self.logged_in_user), (bounds.columns, (bounds.lines*2)-11), id="desktop-background")
+        with self.windows:            
+            yield image.Image(get_user_background(self.logged_in_user), (bounds.columns, (bounds.lines*2)-11), id="desktop-background")
+            
+            for file in os.listdir(f"home/{self.logged_in_user}/Desktop"):
+                path = os.path.join(f"home/{self.logged_in_user}/Desktop", file)
+                
+                new_icon = icon.Icon(path, file, get_file_icon(file))
+                yield new_icon
             
             ready_result = self.on_ready(self)
             if ready_result:
                 for widget in ready_result:
-                    self.app.log(str(widget))
                     yield widget
                     
                     if isinstance(widget, window.Window):

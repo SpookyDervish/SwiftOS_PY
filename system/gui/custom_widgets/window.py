@@ -34,9 +34,14 @@ class Window(Vertical):
         layout: horizontal;
     }
     
+    Window #title-bar #title {
+        text-align: right;
+        margin-right: 1;
+    }
+    
     #title-bar-buttons {
         layout: horizontal;
-        dock: right;
+        dock: left;
         max-width: 9;
     }
     
@@ -52,6 +57,7 @@ class Window(Vertical):
         title: str,
         size: list[int] | None = None,
         start_position: list[int] | None = None,
+        title_bar_options: tuple[bool] = (True, True, True),
         no_title_bar: bool = False,
         name: str | None = None,
         id: str | None = None,
@@ -64,6 +70,7 @@ class Window(Vertical):
             title (str): The title displayed on the window's title bar.
             size (list[int] | None, optional): How many characters wide and tall the window is. Defaults to 50x12.
             start_position (list[int] | None, optional): The position of the window when it's first created. Defaults to the center of the screen.
+            title_bar_options (tuple[bool], optional): A tuple of which title bar buttons should be enabled. (Order: Close, Minimize, Maximize). Defaults to all buttons enabled.
             no_title_bar (bool, optional): If true, the window will have no title bar.
             name (str | None, optional): The name of the widget. Defaults to None.
             id (str | None, optional): The id of the widget in the DOM. Defaults to None.
@@ -97,6 +104,8 @@ class Window(Vertical):
         ]
         
         self.is_dragging = False
+        
+        self.title_bar_options = title_bar_options
         
         self.styles.width = self.window_size[0]
         
@@ -151,7 +160,7 @@ class Window(Vertical):
             
             old_text = title_text.renderable.plain
             
-            title_text.update(f" [bold]{new_title}[/bold]")
+            title_text.update(f"[bold]{new_title}[/bold] ")
         
         return old_text
     
@@ -215,7 +224,7 @@ class Window(Vertical):
         self.is_minimized = False
                 
         self.styles.animate("width", value=self.window_size[0], duration=1/3)
-        self.styles.animate("height", value=self.window_size[1], duration=1/3)
+        self.styles.animate("height", value=self.window_size[1]+1, duration=1/3)
         
         """self.position = [
             position[0],   #- self.window_size[0]/2,
@@ -389,11 +398,16 @@ class Window(Vertical):
         
         if not self.no_title_bar:
             with Container(id="title-bar"):
-                yield Static(f" [bold]{self.title}[/bold]", id="title")
+                yield Static(f"[bold]{self.title}[/bold] ", id="title")
                 
                 with Container(id="title-bar-buttons"):
-                    yield Button("X", variant="error", id="close", classes="title-button")
-                    yield Button("O", variant="warning", id="minimize", classes="title-button")
-                    yield Button("█", variant="success", id="maximize", classes="title-button")
+                    close, mini, maxi = self.title_bar_options
+                    
+                    if close:
+                        yield Button("X", variant="error", id="close", classes="title-button")
+                    if mini:
+                        yield Button("O", variant="warning", id="minimize", classes="title-button")
+                    if maxi:
+                        yield Button("█", variant="success", id="maximize", classes="title-button")
         
         self.app.log(f"Created window: {self.title}")
