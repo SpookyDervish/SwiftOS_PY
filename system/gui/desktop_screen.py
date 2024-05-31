@@ -15,23 +15,37 @@ from system.console import console_bounds
 
 
 class Desktop(Screen):
-    DEFAULT_CSS = """    
+    DEFAULT_CSS = """ 
+    Screen {
+        layers: background foreground;
+    }
+       
     #windows {
-        background: $background-lighten-1;
+        background: transparent;
+        dock: top;
+        margin-top: 4;
     }
     
-    #windows Image, #windows Icon {
+    #windows Icon, #windows Image {
         dock: top;
+    }
+    
+    #windows Window {
+        layer: foreground;
+    }
+    
+    Icon {
+        layer: foreground;
     }
     
     #window-bar {
         dock: top;
         layout: horizontal;
         max-height: 3;
+        
+        layer: foreground;
         margin-top: 1;
     }
-    
-    
     """
     
     def __init__(self, logged_in_user: str) -> None:
@@ -186,6 +200,7 @@ class Desktop(Screen):
         self.windows = Container(id="windows")
         
         window_bar_windows = ["Desktop"]
+        
         with self.windows:            
             yield image.Image(get_user_background(self.logged_in_user), (bounds.columns, (bounds.lines*2)-11), id="desktop-background")
             

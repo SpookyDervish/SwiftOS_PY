@@ -1,26 +1,29 @@
 from textual.app import ComposeResult
-from textual.widgets import Static, Button
+from textual.widgets import Static
 from textual.widget import Widget
+from textual.containers import Center
 from textual import events, on
-from textual.color import Color
 
 import time
 import os
 
-from system.gui.custom_widgets import image, window, dialog
+from system.gui.custom_widgets import image
 
 
 class Icon(Widget):
     DEFAULT_CSS = """
     Icon {
-        width: 10;
-        height: 6;
+        visibility: hidden;
+        
+        width: 11;
+        height: 7;
         margin: 1;
-        background: transparent;
     }
-    
+        
     Icon Static {
-        text-align: center;
+        visibility: visible;
+        width: 9;
+        margin-left: 1;
         background: transparent;
     }
     """
@@ -53,8 +56,8 @@ class Icon(Widget):
         if not os.path.isfile(self.file):
             pass
         
-    def compose(self) -> ComposeResult:
-        yield image.Image(self.icon_path, (10, 10), id="icon-image")
+    def compose(self) -> ComposeResult: 
+        yield image.Image(self.icon_path, (9, 11), id="icon-image")
         yield Static(self.text, id="icon-text")
         
     @on(events.MouseDown)

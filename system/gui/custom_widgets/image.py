@@ -4,6 +4,12 @@ from rich_pixels import Pixels
 
 
 class Image(Static):
+    DEFAULT_CSS = """
+    Image {
+        background: transparent;
+    }
+    """
+    
     def __init__(self, file_path: str, resize: tuple[int, int] | None = None, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
         """A Textual widget of an image.
 

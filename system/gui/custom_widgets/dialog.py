@@ -41,6 +41,10 @@ class Dialog(Window):
             margin-bottom: 3;
         }
         
+        Dialog #buttons-list Button {
+            margin-left: 1;
+        }
+        
         Dialog Image {
             margin-top: 2;
             margin-left: 1;
@@ -65,7 +69,7 @@ class Dialog(Window):
         self.closed = False
         
         min_width = 35
-        width = max(min_width, len(self.message)+35)
+        width = max(min_width, len(self.message)+15)
         
         buttons_list = []
         if self.buttons == DialogButtons.OK:
