@@ -115,7 +115,7 @@ class NotepadWindow(window.Window):
         yield Footer()
 
 
-def execute(desktop: Desktop, args: list[str]):
+async def execute(desktop: Desktop, args: list[str]):
     windows = desktop.query_one("#windows")
     window_bar = desktop.query_one("#window-bar")
     
@@ -129,5 +129,5 @@ def execute(desktop: Desktop, args: list[str]):
     notepad_window = NotepadWindow(title=title, size=[75, 18])
     notepad_window.ARGS = args
     
-    desktop.add_to_window_bar(notepad_window, window_bar)
+    await desktop.add_to_window_bar(notepad_window, window_bar)
     windows.mount(notepad_window)

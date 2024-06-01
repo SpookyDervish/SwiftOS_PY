@@ -63,7 +63,7 @@ class Icon(Widget):
         self.hovered = False
         super().__init__(name=name, id=id, classes=classes, disabled=disabled)
         
-    def open_icon(self):
+    async def open_icon(self):
         if not os.path.exists(self.file):
             def callback(pressed_button: str):
                 if pressed_button == "Yes":
@@ -72,7 +72,7 @@ class Icon(Widget):
             text = f"Couldn't find the file \"{self.file}\", would you like to delete the Shortcut?"
             dialog.create_dialog(text, self.screen, title="SwiftOS Error", buttons=dialog.DialogButtons.YES_NO, icon=dialog.DialogIcon.EXCLAMATION, callback=callback)
             
-        open_file(self.file, self.screen)
+        await open_file(self.file, self.screen)
         
     def compose(self) -> ComposeResult: 
         yield image.Image(self.icon_path, (9, 11), id="icon-image")
@@ -81,15 +81,13 @@ class Icon(Widget):
             , id="icon-text")
         
     @on(events.MouseDown)
-    def mouse_down(self):
+    async def mouse_down(self):
         current_time = time.time()
         
         if abs(current_time - self.last_click) <= self.click_threshold:
             # double click!!!!
             
             self.app.log(f"Icon Openned: (FILE={self.file})")
-            self.open_icon()
+            await self.open_icon()
         
         self.last_click = current_time
-        
-        

@@ -188,14 +188,14 @@ class Desktop(Screen):
         """
         pass
 
-    def add_to_window_bar(self, window, window_bar: TabbedContent):
+    async def add_to_window_bar(self, window, window_bar: TabbedContent):
         window_title = window.title
         
         new_pane = TabPane(window_title, id=self.window_title_to_id(window_title))
         
         if len(window_bar.children) > 0:
             try:
-                window_bar.add_pane(
+                await window_bar.add_pane(
                     new_pane
                 )
             except Exception as e: # Duplicate tab id
