@@ -101,10 +101,15 @@ def create_user(username: str, password: str, admin: bool = False, background: s
             "desktop_background": background,
             "theme": theme,
             
-            "ready": False
+            "ready": False,
+            
+            "defaultPrograms": {
+                "txt": "system/apps/Notepad.py"
+            }
         },
         
-        user_json
+        user_json,
+        indent=4
     )
     user_json.close()
     
@@ -132,7 +137,7 @@ def change_user(username: str, password: str | None = None, admin: bool | None =
     if ready != None:
         user_details["ready"] = ready
 
-    contents = json.dumps(user_details)
+    contents = json.dumps(user_details, indent=4)
     
     json_file = open(f"home/{username}/user.json", "w")
     json_file.write(contents)

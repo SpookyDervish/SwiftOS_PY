@@ -3,6 +3,7 @@ from textual.widget import Widget
 from textual.widgets import Static, Button
 from textual.containers import Horizontal
 from textual.message import Message
+from textual import work, on
 
 from system.gui.custom_widgets.window import Window
 from system.gui.custom_widgets.image import Image
@@ -73,7 +74,7 @@ class Dialog(Window):
             self.button = button
             super().__init__()
     
-    def __init__(self, *children: Widget, message: str, title: str = "Message", buttons: DialogButtons = DialogButtons.OK, icon: DialogIcon = DialogIcon.INFO, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
+    def __init__(self, *children: Widget, message: str, title: str = "Message", buttons: DialogButtons = DialogButtons.OK, icon: DialogIcon = DialogIcon.INFO, name: str | None = None, id: str | None = None, classes: str | None = None, callback = None) -> None:
         """Initialize a dialog. If you want to display a dialog to the Desktop, use the `create_dialog` method.
 
         Args:
@@ -97,6 +98,8 @@ class Dialog(Window):
         
         self.chosen_option = None
         self.closed = False
+        
+        self._callback = callback
         
         min_width = 35
         width = max(min_width, (len(self.message)/2)+20)
@@ -153,18 +156,24 @@ class Dialog(Window):
         else:
             self.chosen_option = event.button.label.plain
             self.app.log(f"Dialog closed (ID={self.id}, TITLE={self.title}, CHOSEN={self.chosen_option})..")
-            self.delete_animation()
-            self.closed = True
             
             self.post_message(self.Submitted(self.chosen_option))
             
+            if self._callback:
+                self._callback(self.chosen_option)
+                
+            self.closed = True
+            self.delete_animation()
             
-def create_dialog(message: str, desktop, title: str = "Message", buttons: DialogButtons = DialogButtons.OK, icon: DialogIcon = DialogIcon.INFO):
+        
+            
+def create_dialog(message: str, desktop, title: str = "Message", buttons: DialogButtons = DialogButtons.OK, icon: DialogIcon = DialogIcon.INFO, callback = None):
     dialog = Dialog(
         message=message,
         title=title,
         buttons=buttons,
-        icon=icon
+        icon=icon,
+        callback=callback
     )
     
     windows = desktop.query_one("#windows")
@@ -173,3 +182,5 @@ def create_dialog(message: str, desktop, title: str = "Message", buttons: Dialog
     windows.mount(dialog)
     
     desktop.add_to_window_bar(dialog, window_bar)
+    
+    return dialog

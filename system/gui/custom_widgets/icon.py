@@ -8,7 +8,7 @@ import time
 import os
 
 from system.gui.custom_widgets import image, dialog
-from system.gui.desktop_screen import Desktop
+from system.fs import open_file
 
 
 class Icon(Widget):
@@ -59,10 +59,13 @@ class Icon(Widget):
         super().__init__(name=name, id=id, classes=classes, disabled=disabled)
         
     def open_icon(self):
-        if os.path.isfile(self.file):
-            text = f"Couldn't find the file \"{self.file}\", would you like to delete the Shortcut?"
+        if not os.path.isfile(self.file):
+            def callback(pressed_button: str):
+                if pressed_button == "Yes":
+                    self.remove()
             
-            answer = dialog.create_dialog(text, self.screen, title="SwiftOS Error", buttons=dialog.DialogButtons.YES_NO, icon=dialog.DialogIcon.EXCLAMATION)
+            text = f"Couldn't find the file \"{self.file}\", would you like to delete the Shortcut?"
+            dialog.create_dialog(text, self.screen, title="SwiftOS Error", buttons=dialog.DialogButtons.YES_NO, icon=dialog.DialogIcon.EXCLAMATION, callback=callback)
         
     def compose(self) -> ComposeResult: 
         yield image.Image(self.icon_path, (9, 11), id="icon-image")
@@ -79,3 +82,5 @@ class Icon(Widget):
             self.open_icon()
         
         self.last_click = current_time
+        
+        

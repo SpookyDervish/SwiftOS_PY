@@ -197,7 +197,6 @@ Press **"Finish"** to end Setup.
             is_error = True
             status.update(f"[bold red]{message}[/bold red]")
 
-        self.app.log(not event.validation_result.is_valid and len(event.validation_result.failure_descriptions) > 0)
         validations = {
             "validation_result": lambda: ( not event.validation_result.is_valid,
                                     event.validation_result.failure_descriptions),

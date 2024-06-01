@@ -11,7 +11,6 @@ from secrets import choice
 from time import sleep
 
 from system.console import console_bounds
-from system.gui.desktop_screen import Desktop
 
 
 def generate_random_string(length: int):
@@ -413,7 +412,7 @@ class Window(Vertical):
         self.app.log(f"Created window: {self.title}")
         
         
-    ### HELPER FUNCTIONS ###
+    ### DUNDER FUNCTIONS ###
     def __str__(self) -> str:
         state = ""
         if self.is_maximised:

@@ -8,17 +8,16 @@ from textual.widgets import Static, Footer
 
 from configparser import ConfigParser
 
-from system.gui.custom_widgets import image, icon, window, dialog
-
 from system.gui import loading_screen
 from system.gui import login_screen
 from system.gui import setup_screen
-from system.gui import desktop_screen
+from system.gui.desktop_screen import Desktop
 from system.users import get_valid_users
+from system import fs
 from main import SwiftOS
 
 
-def on_ready(desktop: desktop_screen.Desktop) -> ComposeResult:
+def on_ready(desktop: Desktop) -> ComposeResult:
     pass
 
 @work
@@ -69,7 +68,7 @@ async def boot(app : SwiftOS, ini_path: str):
     logged_in_user = "Nathaniel"
     
     app.log("Loading desktop..")
-    desktop = desktop_screen.Desktop(logged_in_user)
+    desktop = Desktop(logged_in_user)
     desktop.on_ready = on_ready
     
     app.pop_screen()

@@ -201,7 +201,8 @@ class Desktop(Screen):
                 window_bar.add_pane(
                     new_pane
                 )
-            except Tabs.TabError: # Duplicate tab id
+            except Exception as e: # Duplicate tab id
+                self.app.log(e)
                 self.app.log(f"Failed to add Window to Window Bar: ({window_bar}): {window}): Window already exists in window bar.")
         else:
             return new_pane
