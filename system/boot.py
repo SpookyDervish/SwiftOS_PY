@@ -11,6 +11,7 @@ from configparser import ConfigParser
 from system.gui import loading_screen
 from system.gui import login_screen
 from system.gui import setup_screen
+from system.gui.custom_widgets.window import Window
 from system.gui.desktop_screen import Desktop
 from system.users import get_valid_users
 from system import fs
@@ -18,7 +19,9 @@ from main import SwiftOS
 
 
 def on_ready(desktop: Desktop) -> ComposeResult:
-    pass
+    yield Window(title="Test Window 1")
+    yield Window(title="Test Window 2")
+    yield Window(title="Test Window 3")
 
 @work
 async def boot(app : SwiftOS, ini_path: str):

@@ -201,10 +201,12 @@ class Desktop(Screen):
                 window_bar.add_pane(
                     new_pane
                 )
+                self.app.log("sup")
             except Exception as e: # Duplicate tab id
                 self.app.log(e)
                 self.app.log(f"Failed to add Window to Window Bar: ({window_bar}): {window}): Window already exists in window bar.")
         else:
+            self.app.log("👍")
             return new_pane
         
         self.app.log(f"Window Added to Window bar ({window_bar}): {window}")
@@ -241,8 +243,12 @@ class Desktop(Screen):
                         self.app.log(f"Window Added to Desktop ({self}): ID={widget.id}")
         
         with TabbedContent(id="window-bar") as tabs:
+            yield TabPane("Desktop")
+            
             for win in window_bar_windows:
                 yield self.add_to_window_bar(win, tabs)
+                
+
         
         yield Footer()
 

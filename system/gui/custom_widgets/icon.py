@@ -66,6 +66,8 @@ class Icon(Widget):
             
             text = f"Couldn't find the file \"{self.file}\", would you like to delete the Shortcut?"
             dialog.create_dialog(text, self.screen, title="SwiftOS Error", buttons=dialog.DialogButtons.YES_NO, icon=dialog.DialogIcon.EXCLAMATION, callback=callback)
+            
+        open_file(self.file, self.screen)
         
     def compose(self) -> ComposeResult: 
         yield image.Image(self.icon_path, (9, 11), id="icon-image")
