@@ -71,7 +71,6 @@ def open_file(file_path: str, desktop):
     if not os.path.exists(file_path): # The file doesn't exist
         raise FileNotFoundError(file_path)
     
-    desktop.notify(ext)
     try:
         default_app = apps[ext]
     except KeyError: # There is no default app to handle this file extension...
