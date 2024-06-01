@@ -4,11 +4,24 @@ from system.gui.desktop_screen import Desktop
 from system.gui.custom_widgets import window, dialog
 from system.fs import get_file_extension
 
-from textual.widgets import TextArea, Footer, Static
+from rich.syntax import Syntax
+
+from textual.widgets import TextArea, Footer, Static, DirectoryTree
+from textual.containers import VerticalScroll
 from textual.binding import Binding
 
-
 class NotepadWindow(window.Window):    
+    DEFAULT_CSS = """
+    #tree-view {
+        dock: left;
+        height: 100%;
+        margin-top: 1;
+        overflow: auto;
+        scrollbar-gutter: stable;
+        width: auto;
+    }
+    """
+    
     BINDINGS = [
         Binding("ctrl+s", "save", "Save"),
         Binding("ctrl+shift+s", "save_as", "Save as")
@@ -18,7 +31,7 @@ class NotepadWindow(window.Window):
         text_area = self.query_one(TextArea)
         
         try:
-            f = open(self.ARGS[0], "w")
+            f = open(self.open_file, "w")
             f.write(text_area.text)
             f.close()
         except Exception as e:
@@ -29,8 +42,56 @@ class NotepadWindow(window.Window):
                 icon=dialog.DialogIcon.CRITICAL
             )
     
+    def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected):
+        event.stop()
+        code_view = self.query_one("#code-view", TextArea)
+        
+        self.open_file = event.path
+        
+        try:
+            f = open(self.open_file, "r")
+        except FileNotFoundError:
+            dialog.create_dialog(
+                "File not found.",
+                self.screen,
+                "Couldn't Open File",
+                icon=dialog.DialogIcon.EXCLAMATION
+            )
+            return
+        contents = f.read()
+        f.close()
+        
+        code_view.text = contents
+        code_view.language = self.file_path_to_lang(self.open_file)
+        
+        #self.set_title(str(os.path.basename(event.path)))
+    
+    def file_path_to_lang(self, file_path: str):
+        ext = get_file_extension(file_path)
+        
+        extensions = {
+            "py": "python",
+            "md": "markdown",
+            "json": "json",
+            "css": "css",
+            "tcss": "css",
+            "html": "html",
+            "htm": "html",
+            "js": "javascript",
+            "java": "java",
+            "sh": "bash",
+            "go": "go"
+        }
+        
+        try:
+            ext = extensions[ext]
+        except KeyError:
+            ext = None
+            
+        return ext
+    
     def on_ready(self):
-        desktop = self.screen
+        self.open_file = None
         
         ext = None
         
@@ -38,19 +99,19 @@ class NotepadWindow(window.Window):
         if len(self.ARGS) > 0:
             
             if os.path.isfile(self.ARGS[0]):
-                f = open(self.ARGS[0])
+                self.open_file = self.ARGS[0]
+                
+                f = open(self.open_file)
                 TEXT = f.read()
                 f.close()
         
-                ext = get_file_extension(self.ARGS[0])
-                if ext == "txt":
-                    ext = None
-                elif ext == "py":
-                    ext = "python"
-                elif ext == "md":
-                    ext = "markdown"
+                ext = self.file_path_to_lang(self.ARGS[0])
         
-        yield TextArea(TEXT, language=ext, theme="dracula", show_line_numbers=True, soft_wrap=False)
+        path = os.getcwd() if len(self.ARGS) < 1 else os.path.dirname(self.open_file)
+        yield DirectoryTree(path, id="tree-view")
+        
+        with VerticalScroll():
+            yield TextArea(TEXT, language=ext, theme="dracula", show_line_numbers=True, soft_wrap=False, id="code-view")
         yield Footer()
 
 

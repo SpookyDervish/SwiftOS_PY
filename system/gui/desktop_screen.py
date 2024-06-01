@@ -153,11 +153,8 @@ class Desktop(Screen):
         Returns:
             str: The id of the tab in the window bar.
         """
-        no_punctuation = title.translate(
-            str.maketrans('', '', punctuation)
-        )
-        
-        return title.replace(" ", "-").replace("|", "").replace(".", "_").lower()
+        no_punctuation = title.translate(str.maketrans(' ', '_', punctuation))
+        return no_punctuation.lower()
     
     async def deselect_window(self, selected_window) -> None:
         """
@@ -204,7 +201,6 @@ class Desktop(Screen):
             except Exception as e: # Duplicate tab id
                 self.app.log(f"Failed to add Window to Window Bar: ({window_bar}): {window}): Window already exists in window bar.")
         else:
-            self.app.log("👍")
             return new_pane
         
         self.app.log(f"Window Added to Window bar ({window_bar}): {window}")
