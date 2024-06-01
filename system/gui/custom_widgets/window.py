@@ -352,11 +352,11 @@ class Window(Vertical):
         
         #self.query_one("#title-bar").styles.animate("height", value=0, duration=1.0)
         sleep(1/3 + 0.25)
-        try:
-            self.parent.parent.remove_window(self)
-        except RuntimeError:
+        #try:
+        self.parent.parent.remove_window(self)
+        """except RuntimeError:
             # Stop crying and just accept that I'm trying to delete something, smh :/
-            pass 
+            pass """
             
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """
@@ -411,3 +411,16 @@ class Window(Vertical):
                         yield Button("█", variant="success", id="maximize", classes="title-button")
         
         self.app.log(f"Created window: {self.title}")
+        
+        
+    ### HELPER FUNCTIONS ###
+    def __str__(self) -> str:
+        state = ""
+        if self.is_maximised:
+            state = "MAXIMISED"
+        elif self.is_minimized:
+            state = "MINIMIZED"
+        else:
+            state = "RESTORED"
+        
+        return f"(TITLE={self.title}, ID={self.id}, STATE={state})"

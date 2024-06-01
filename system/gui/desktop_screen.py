@@ -2,9 +2,9 @@ import os
 
 from textual.screen import Screen
 from textual.app import ComposeResult
-from textual.widgets import Header, Footer, Static, TabbedContent, TabPane
+from textual.widgets import Header, Footer, Static, TabbedContent, TabPane, Tabs
 from textual.containers import Container
-from textual import events, on
+from textual import events, on, work
 
 from string import punctuation
 
@@ -61,8 +61,9 @@ class Desktop(Screen):
         self.selected_window = None
         
         self.__mouse_pos = (0, 0)
-        
-    def remove_window(self, removed_window) -> None:
+    
+    @work()
+    async def remove_window(self, removed_window) -> None:
         """Remove a window from the desktop.
 
         Args:
@@ -74,10 +75,9 @@ class Desktop(Screen):
         window_bar.active = ""
         
         win_id = self.window_title_to_id(removed_window.title)
-        window_bar.remove_pane(f"{win_id}")
+        window_bar.remove_pane(win_id)
         
         self.windows.query_one(f"#{removed_window.id}").remove()
-        del window
         
         self.app.log(f"Window Removed From Desktop ({self}): {removed_window.id}")
     
@@ -159,7 +159,7 @@ class Desktop(Screen):
         
         return title.replace(" ", "-").lower()
     
-    def deselect_window(self, selected_window) -> None:
+    async def deselect_window(self, selected_window) -> None:
         """
         Give a visual indicator that a window is not selected.
 
@@ -171,7 +171,10 @@ class Desktop(Screen):
         win_id = self.window_title_to_id(selected_window.title)
         
         window_bar: TabbedContent = self.query_one("#window-bar")
-        window_bar.remove_pane(win_id)
+        pane = window_bar.get_pane(win_id)
+        
+        window_bar.remove_pane(pane.id)
+        pane.remove()
         
         # This basically checks if the selected_window is self.selected_window,
         # if they're the same self.selected_window is set to None.
@@ -187,6 +190,23 @@ class Desktop(Screen):
         This should return Textual widgets using `yield` to add to the desktop.
         """
         pass
+
+    def add_to_window_bar(self, window, window_bar: TabbedContent):
+        window_title = window.title
+        
+        new_pane = TabPane(window_title, id=self.window_title_to_id(window_title))
+        
+        if len(window_bar.children) > 0:
+            try:
+                window_bar.add_pane(
+                    new_pane
+                )
+            except Tabs.TabError: # Duplicate tab id
+                self.app.log(f"Failed to add Window to Window Bar: ({window_bar}): {window}): Window already exists in window bar.")
+        else:
+            return new_pane
+        
+        self.app.log(f"Window Added to Window bar ({window_bar}): {window}")
     
     def compose(self) -> ComposeResult:
         with Header(show_clock=True):
@@ -199,7 +219,7 @@ class Desktop(Screen):
         
         self.windows = Container(id="windows")
         
-        window_bar_windows = ["Desktop"]
+        window_bar_windows = []
         
         with self.windows:            
             yield image.Image(get_user_background(self.logged_in_user), (bounds.columns, (bounds.lines*2)-11), id="desktop-background")
@@ -216,13 +236,12 @@ class Desktop(Screen):
                     yield widget
                     
                     if isinstance(widget, window.Window):
-                        window_bar_windows.append(widget.title)
+                        window_bar_windows.append(widget)
                         self.app.log(f"Window Added to Desktop ({self}): ID={widget.id}")
         
         with TabbedContent(id="window-bar") as tabs:
-            for title in window_bar_windows:
-                yield TabPane(title, id=self.window_title_to_id(title))
-                #self.app.log(f"Window Added to Window bar ({tabs}): (TITLE={widget.title}, ID={widget.id})")
+            for win in window_bar_windows:
+                yield self.add_to_window_bar(win, tabs)
         
         yield Footer()
 

@@ -7,7 +7,8 @@ from textual import events, on
 import time
 import os
 
-from system.gui.custom_widgets import image
+from system.gui.custom_widgets import image, dialog
+from system.gui.desktop_screen import Desktop
 
 
 class Icon(Widget):
@@ -16,7 +17,7 @@ class Icon(Widget):
         visibility: hidden;
         
         width: 11;
-        height: 7;
+        height: 8;
         margin: 1;
     }
         
@@ -25,6 +26,11 @@ class Icon(Widget):
         width: 9;
         margin-left: 1;
         background: transparent;
+    }
+    
+    Icon #icon-image {
+        margin-bottom: 1;
+        margin-left: 1;
     }
     """
     
@@ -45,7 +51,7 @@ class Icon(Widget):
         self.icon_path = icon_path if icon_path is not None else "system/assets/images/icons/txt.png"
         
         self.file = associated_file
-        self.last_click = 999999999999999 # set it to a really high number to not accidentally open an icon
+        self.last_click = -999999999999999 # set it to a really low number to not accidentally open an icon
         
         self.click_threshold = 0.5 # clicks must be within 0.5 seconds to be considered a double click
         
@@ -53,8 +59,10 @@ class Icon(Widget):
         super().__init__(name=name, id=id, classes=classes, disabled=disabled)
         
     def open_icon(self):
-        if not os.path.isfile(self.file):
-            pass
+        if os.path.isfile(self.file):
+            text = f"Couldn't find the file \"{self.file}\", would you like to delete the Shortcut?"
+            
+            answer = dialog.create_dialog(text, self.screen, title="SwiftOS Error", buttons=dialog.DialogButtons.YES_NO, icon=dialog.DialogIcon.EXCLAMATION)
         
     def compose(self) -> ComposeResult: 
         yield image.Image(self.icon_path, (9, 11), id="icon-image")
@@ -64,9 +72,10 @@ class Icon(Widget):
     def mouse_down(self):
         current_time = time.time()
         
-        if current_time - self.last_click <= self.click_threshold:
+        if abs(current_time - self.last_click) <= self.click_threshold:
             # double click!!!!
             
+            self.app.log(f"Icon Openned: (FILE={self.file})")
             self.open_icon()
         
         self.last_click = current_time
