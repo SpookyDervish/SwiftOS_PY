@@ -13,7 +13,7 @@ from system.gui import login_screen
 from system.gui import setup_screen
 from system.gui.custom_widgets.window import Window
 from system.gui.desktop_screen import Desktop
-from system.users import get_valid_users
+from system.users import get_valid_users, get_user_details
 from system import fs
 from main import SwiftOS
 
@@ -67,6 +67,12 @@ async def boot(app : SwiftOS, ini_path: str):
     logged_in_user = await app.push_screen_wait(login_form)
     app.log(f"Login completed! Logged in user: \"{logged_in_user}\"")"""
     logged_in_user = "Nathaniel"
+    
+    user_details = get_user_details(logged_in_user)
+    if user_details["theme"] == "light":
+        app.dark = False
+    else:
+        app.dark = True
     
     app.log("Loading desktop..")
     desktop = Desktop(logged_in_user)

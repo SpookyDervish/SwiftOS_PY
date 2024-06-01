@@ -10,7 +10,8 @@ from textual.binding import Binding
 
 class NotepadWindow(window.Window):    
     BINDINGS = [
-        Binding("ctrl+s", "save", "Save file", priority=True)
+        Binding("ctrl+s", "save", "Save"),
+        Binding("ctrl+shift+s", "save_as", "Save as")
     ]
     
     def action_save(self):
@@ -46,8 +47,10 @@ class NotepadWindow(window.Window):
                     ext = None
                 elif ext == "py":
                     ext = "python"
+                elif ext == "md":
+                    ext = "markdown"
         
-        yield TextArea(TEXT, language=ext, theme="css", show_line_numbers=True)
+        yield TextArea(TEXT, language=ext, theme="dracula", show_line_numbers=True, soft_wrap=False)
         yield Footer()
 
 
@@ -55,7 +58,14 @@ def execute(desktop: Desktop, args: list[str]):
     windows = desktop.query_one("#windows")
     window_bar = desktop.query_one("#window-bar")
     
-    notepad_window = NotepadWindow(title="Notepad", size=[75, 18])
+    title = "Notepad | "
+    if len(args) > 0:
+        file_name = os.path.basename(args[0])
+        title += file_name
+    else:
+        title += "New File"
+    
+    notepad_window = NotepadWindow(title=title, size=[75, 18])
     notepad_window.ARGS = args
     
     desktop.add_to_window_bar(notepad_window, window_bar)

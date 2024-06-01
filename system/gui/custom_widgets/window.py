@@ -157,6 +157,9 @@ class Window(Vertical):
         self.title = new_title
         
         if not self.no_title_bar:
+            for wid in self.query():
+                self.app.log(str(wid))
+            
             title_bar = self.query_one("#title-bar")
             title_text = title_bar.query_one("#title")
             
@@ -415,8 +418,10 @@ class Window(Vertical):
                     if maxi:
                         yield Button("█", variant="success", id="maximize", classes="title-button")
         
-        for widget in self.on_ready():
-            yield widget
+        children = self.on_ready()
+        if children:
+            for widget in children:
+                yield widget
         
         self.app.log(f"Created window: {self.title}")
         

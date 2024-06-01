@@ -157,7 +157,7 @@ class Desktop(Screen):
             str.maketrans('', '', punctuation)
         )
         
-        return title.replace(" ", "-").lower()
+        return title.replace(" ", "-").replace("|", "").replace(".", "_").lower()
     
     async def deselect_window(self, selected_window) -> None:
         """
@@ -201,9 +201,7 @@ class Desktop(Screen):
                 window_bar.add_pane(
                     new_pane
                 )
-                self.app.log("sup")
             except Exception as e: # Duplicate tab id
-                self.app.log(e)
                 self.app.log(f"Failed to add Window to Window Bar: ({window_bar}): {window}): Window already exists in window bar.")
         else:
             self.app.log("👍")

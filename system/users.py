@@ -104,7 +104,10 @@ def create_user(username: str, password: str, admin: bool = False, background: s
             "ready": False,
             
             "defaultPrograms": {
-                "txt": "system/apps/Notepad.py"
+                "txt": "system/apps/Notepad.py",
+                "md": "system/apps/Notepad.py",
+                "py": "system/apps/Notepad.py",
+                "/folder\\": "system/apps/Files.py"
             }
         },
         

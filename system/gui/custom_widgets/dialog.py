@@ -61,8 +61,8 @@ class Dialog(Window):
     
     Dialog #text {
         text-align: left;
-        padding-right: 6;
-        dock: right;
+        margin-left: 16;
+        dock: left;
         margin-top: 4;
         max-width: 50;
     }
@@ -101,8 +101,8 @@ class Dialog(Window):
         
         self._callback = callback
         
-        min_width = 35
-        width = max(min_width, (len(self.message)/2)+20)
+        min_width = 30
+        width = max(min_width, (len(self.message)/2)+12)
         
         buttons_list = []
         if self.buttons == DialogButtons.OK:

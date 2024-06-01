@@ -6,6 +6,7 @@ from textual import events, on
 
 import time
 import os
+from textwrap import shorten
 
 from system.gui.custom_widgets import image, dialog
 from system.fs import open_file
@@ -31,6 +32,10 @@ class Icon(Widget):
     Icon #icon-image {
         margin-bottom: 1;
         margin-left: 1;
+    }
+    
+    Icon #icon-text {
+        text-align: center;
     }
     """
     
@@ -59,7 +64,7 @@ class Icon(Widget):
         super().__init__(name=name, id=id, classes=classes, disabled=disabled)
         
     def open_icon(self):
-        if not os.path.isfile(self.file):
+        if not os.path.exists(self.file):
             def callback(pressed_button: str):
                 if pressed_button == "Yes":
                     self.remove()
@@ -71,12 +76,9 @@ class Icon(Widget):
         
     def compose(self) -> ComposeResult: 
         yield image.Image(self.icon_path, (9, 11), id="icon-image")
-        
-        text = self.text
-        if len(text) > int(9/2)+1:
-            text = self.text[:int(9/2)+2]
-            text += "..."
-        yield Static(text, id="icon-text")
+        yield Static(
+            shorten(self.text, width=10, placeholder="..")
+            , id="icon-text")
         
     @on(events.MouseDown)
     def mouse_down(self):
