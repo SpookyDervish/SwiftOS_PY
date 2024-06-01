@@ -33,7 +33,7 @@ def get_file_icon(file_path: str):
     try:
         return icons[extension]
     except KeyError:
-        return icons[".txt"]
+        return icons["txt"]
     
 def run(app_path: str, desktop, args: list[str]):
     name = os.path.basename(app_path)[:-3]

@@ -71,7 +71,12 @@ class Icon(Widget):
         
     def compose(self) -> ComposeResult: 
         yield image.Image(self.icon_path, (9, 11), id="icon-image")
-        yield Static(self.text, id="icon-text")
+        
+        text = self.text
+        if len(text) > int(9/2)+1:
+            text = self.text[:int(9/2)+2]
+            text += "..."
+        yield Static(text, id="icon-text")
         
     @on(events.MouseDown)
     def mouse_down(self):

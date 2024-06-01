@@ -19,9 +19,7 @@ from main import SwiftOS
 
 
 def on_ready(desktop: Desktop) -> ComposeResult:
-    yield Window(title="Test Window 1")
-    yield Window(title="Test Window 2")
-    yield Window(title="Test Window 3")
+    pass
 
 @work
 async def boot(app : SwiftOS, ini_path: str):

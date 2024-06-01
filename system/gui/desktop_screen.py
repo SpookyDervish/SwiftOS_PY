@@ -225,7 +225,7 @@ class Desktop(Screen):
         window_bar_windows = []
         
         with self.windows:            
-            yield image.Image(get_user_background(self.logged_in_user), (bounds.columns, (bounds.lines*2)-11), id="desktop-background")
+            yield image.Image(get_user_background(self.logged_in_user), (bounds.columns, (bounds.lines*2)-9), id="desktop-background")
             
             for file in os.listdir(f"home/{self.logged_in_user}/Desktop"):
                 path = os.path.join(f"home/{self.logged_in_user}/Desktop", file)
@@ -248,8 +248,5 @@ class Desktop(Screen):
             for win in window_bar_windows:
                 yield self.add_to_window_bar(win, tabs)
                 
-
-        
-        yield Footer()
 
         self.app.log("Desktop ready!")

@@ -114,6 +114,7 @@ def create_user(username: str, password: str, admin: bool = False, background: s
     user_json.close()
     
     os.mkdir(f"{user_dir}/Desktop")
+    os.mkdir(f"{user_dir}/Desktop/Recycle Bin")
     os.mkdir(f"{user_dir}/Documents")
     os.mkdir(f"{user_dir}/Downloads")
     os.mkdir(f"{user_dir}/Videos")

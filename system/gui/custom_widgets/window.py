@@ -117,6 +117,9 @@ class Window(Vertical):
         
         self.is_maximised = False
         self.is_minimized = False
+        
+        # Intended for use in applications. Pass a list of arguments to a window for use in an application.
+        self.ARGS = []
     
     def set_as_primary(self):
         """Set this window as the selected window.
@@ -308,7 +311,7 @@ class Window(Vertical):
             
             self.styles.animate("offset", value=new_offset, duration=1/3)
         else:
-            self.normal_size_animation(self.position)
+            self.normal_size_animation()
             
     @work(thread=True)
     def maximize_animation(self):
@@ -320,7 +323,7 @@ class Window(Vertical):
         bounds = console_bounds()
         
         self.styles.animate("width", value=bounds.columns, duration=1/3)
-        self.styles.animate("height", value=bounds.lines-5, duration=1/3)
+        self.styles.animate("height", value=bounds.lines-4, duration=1/3)
         
         new_offset = ScalarOffset(
             Scalar(0, Unit(1), Unit(1)),
@@ -378,6 +381,9 @@ class Window(Vertical):
             self.maximize_animation()
         
     
+    def on_ready(self):
+        pass
+    
     def compose(self) -> ComposeResult:
         """
         Compose the window.
@@ -408,6 +414,9 @@ class Window(Vertical):
                         yield Button("O", variant="warning", id="minimize", classes="title-button")
                     if maxi:
                         yield Button("█", variant="success", id="maximize", classes="title-button")
+        
+        for widget in self.on_ready():
+            yield widget
         
         self.app.log(f"Created window: {self.title}")
         
