@@ -146,7 +146,7 @@ class Dialog(Window):
             title_bar_options=(True, True, False)
         )
         
-    def on_button_pressed(self, event: Button.Pressed) -> None:
+    async def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "close":
             self.chosen_option = "None"
             self.app.log(f"Dialog closed (ID={self.id}, TITLE={self.title}, CHOSEN={self.chosen_option})..")
@@ -160,7 +160,7 @@ class Dialog(Window):
             self.post_message(self.Submitted(self.chosen_option))
             
             if self._callback:
-                self._callback(self.chosen_option)
+                await self._callback(self.chosen_option)
                 
             self.closed = True
             self.delete_animation()

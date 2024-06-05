@@ -16,6 +16,10 @@ class UserAlreadyExistsError(Exception):
 class InvalidUserError(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(f"\"{args[0]}\" is not a user.")
+        
+class CorruptedUserError(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(f"The user \"{args[0]}\" is corrupted (their user.json is formatted incorrectly), please recreate this user.")
 
 
 def get_backgrounds():
@@ -45,7 +49,12 @@ def get_user_details(username: str):
     if os.path.isdir(f"home/{username}"):
         if os.path.isfile(f"home/{username}/user.json"):
             contents = open(f"home/{username}/user.json", "r")
-            details = json.loads(contents.read())
+            
+            try:
+                details = json.loads(contents.read())
+            except json.JSONDecodeError:
+                raise CorruptedUserError(username)
+                
             contents.close()
             
             return details

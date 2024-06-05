@@ -184,9 +184,20 @@ class Desktop(Screen):
         Overwritable placeholder method for when the Desktop is fully
         initialized.
         
-        This should return Textual widgets using `yield` to add to the desktop.
+        This should return Textual widgets using `yield` to add to them to the desktop.
         """
         pass
+    
+    async def change_window_name(self, window, new_title: str, window_bar: TabbedContent):
+        window_title = window.title
+        window_id = self.window_title_to_id(window_title)
+        
+        window_bar.remove_pane(window_id)
+        
+        window.set_title(new_title)
+        await self.add_to_window_bar(window, window_bar)
+        
+        self.app.log(f"Renamed Window in Window bar ({window_bar}): {window}")
 
     async def add_to_window_bar(self, window, window_bar: TabbedContent):
         window_title = window.title

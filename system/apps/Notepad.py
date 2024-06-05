@@ -10,7 +10,7 @@ from textual.widgets import TextArea, Footer, Static, DirectoryTree
 from textual.containers import VerticalScroll
 from textual.binding import Binding
 
-from textual_fspicker import FileSave
+from textual_fspicker import FileSave, FileOpen
 
 from textual import work
 
@@ -30,8 +30,26 @@ class NotepadWindow(window.Window):
     
     BINDINGS = [
         Binding("ctrl+s", "save", "Save"),
-        Binding("ctrl+shift+s", "save_as", "Save as")
+        Binding("ctrl+shift+s", "save_as", "Save as"),
+        Binding("ctrl+o", "open", "Open file")
     ]
+    
+    async def read_file(self, file_path: str):
+        new_title = os.path.basename(file_path)
+        
+        window_bar = self.screen.query_one("#window-bar")
+        text_area = self.query_one(TextArea)
+        
+        f = open(file_path, "r")
+        text_area.load_text(f.read())
+        f.close()
+        
+        self.open_file = file_path
+        
+        text_area.language = self.file_path_to_lang(file_path)
+        
+        await self.screen.change_window_name(self, new_title, window_bar)
+        self.unsaved_changes = False
     
     def action_save(self):
         text_area = self.query_one(TextArea)
@@ -52,7 +70,7 @@ class NotepadWindow(window.Window):
         text_area = self.query_one(TextArea)
         chosen_file = None
         
-        def save_dialog(answer):
+        def save_dialog(answer: str):
             if answer == "Yes" and chosen_file:
                 with open(str(chosen_file), "w") as f:
                     f.write(text_area.text)
@@ -71,6 +89,36 @@ class NotepadWindow(window.Window):
         
         file_save_dialog = FileSave()
         await self.app.push_screen(file_save_dialog, callback=on_save)
+    
+    def action_open(self):
+        text_area = self.query_one(TextArea)
+        chosen_file = None
+        
+        async def unsaved_changes_dialog(answer: str):
+            if not chosen_file:
+                return
+            
+            if answer == "Yes": # Save the changes
+                with open(self.open_file, "w") as f:
+                    f.write(text_area.text)
+
+            await self.read_file(chosen_file)
+        
+        async def on_open(file):
+            nonlocal chosen_file
+            chosen_file = file
+            
+            if file: # If the user didn't press "Cancel"
+                if self.unsaved_changes: # If the user has made unsaved changes
+                    await create_dialog("You have unsaved changes! Would you like to save them?", self.screen, "Open file", buttons=DialogButtons.YES_NO, icon=DialogIcon.QUESTION, callback=unsaved_changes_dialog)
+                else:
+                    await self.read_file(file)
+        
+        file_open_dialog = FileOpen()
+        self.app.push_screen(file_open_dialog, callback=on_open)
+        
+    def on_text_area_changed(self, event: TextArea.Changed):
+        self.unsaved_changes = True
     
     """def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected):
         event.stop()
@@ -122,6 +170,7 @@ class NotepadWindow(window.Window):
     
     def on_ready(self):
         self.open_file = None
+        self.unsaved_changes = False
         
         ext = None
         
