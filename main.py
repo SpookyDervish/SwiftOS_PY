@@ -37,7 +37,6 @@ class SwiftOS(App):
         
     def action_safe_mode(self):
         if self.__boot_ready:
-            self.query_one("#boot_log").write(":D")
             if not self.safe_mode:
                 console.log(self.query_one("#boot_log"), "Safe Mode has been enabled!", console.LogLevel.WARNING)
             
