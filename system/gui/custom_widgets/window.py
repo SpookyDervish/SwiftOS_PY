@@ -1,7 +1,7 @@
 from textual.app import ComposeResult
 from textual.containers import Container, Vertical
 from textual.widget import Widget
-from textual.widgets import Static, Button
+from textual.widgets import Static, Button, TextArea, Input, Select
 
 from textual import events, on, work
 from textual.css.scalar import ScalarOffset, Scalar, Unit
@@ -174,9 +174,12 @@ class Window(Vertical):
         """Handle when the mouse enters the window."""
         self.is_dragging = False
         
-    def on_mouse_down(self):
+    def on_mouse_down(self, event: events.MouseDown):
         """Handle when the left mouse button begins to be held on the window."""
-        self.is_dragging = True
+        focused = self.screen.get_widget_at(event.screen_x, event.screen_y)[0]
+        
+        if not isinstance(focused, TextArea) and not isinstance(focused, Input) and not isinstance(focused, Select):
+            self.is_dragging = True
         
         self.screen.select_window(self)
     

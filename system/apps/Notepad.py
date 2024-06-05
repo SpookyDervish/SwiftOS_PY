@@ -31,7 +31,8 @@ class NotepadWindow(window.Window):
     BINDINGS = [
         Binding("ctrl+s", "save", "Save"),
         Binding("ctrl+shift+s", "save_as", "Save as"),
-        Binding("ctrl+o", "open", "Open file")
+        Binding("ctrl+o", "open", "Open file"),
+        Binding("ctrl+n", "new", "New file")
     ]
     
     async def read_file(self, file_path: str):
@@ -51,15 +52,19 @@ class NotepadWindow(window.Window):
         await self.screen.change_window_name(self, new_title, window_bar)
         self.unsaved_changes = False
     
-    def action_save(self):
+    async def action_save(self):
         text_area = self.query_one(TextArea)
+        
+        if not self.open_file:
+            await self.action_save_as()
+            return
         
         try:
             f = open(self.open_file, "w")
             f.write(text_area.text)
             f.close()
         except Exception as e:
-            dialog.create_dialog(
+            await dialog.create_dialog(
                 str(e),
                 self.screen,
                 "Failed to save file!",
@@ -117,6 +122,25 @@ class NotepadWindow(window.Window):
         file_open_dialog = FileOpen()
         self.app.push_screen(file_open_dialog, callback=on_open)
         
+    async def action_new(self):
+        text_area = self.query_one(TextArea)
+        window_bar = self.screen.query_one("#window-bar")
+        
+        async def unsaved_changes_dialog(answer: str):
+            if answer == "Yes": # Save the changes
+                with open(self.open_file, "w") as f:
+                    f.write(text_area.text)
+        
+        if self.unsaved_changes:
+            await create_dialog("You have unsaved changes! Would you like to save them?", self.screen, "New file", buttons=DialogButtons.YES_NO, icon=DialogIcon.QUESTION, callback=unsaved_changes_dialog)
+        else:
+            text_area.text = ""
+            self.unsaved_changes = False
+            
+            await self.screen.change_window_name(self, "Notepad | New File", window_bar)
+        
+        self.open_file = None
+        
     def on_text_area_changed(self, event: TextArea.Changed):
         self.unsaved_changes = True
     
@@ -167,6 +191,8 @@ class NotepadWindow(window.Window):
             ext = None
             
         return ext
+    
+    
     
     def on_ready(self):
         self.open_file = None

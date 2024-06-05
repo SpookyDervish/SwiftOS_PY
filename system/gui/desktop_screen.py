@@ -19,22 +19,30 @@ class Desktop(Screen):
     Screen {
         layers: background foreground;
     }
-       
+    
+    #desktop-background {
+        layer: background;
+        margin-top: 4;
+    }
+
     #windows {
         background: transparent;
         dock: top;
         margin-top: 4;
-    }
-    
-    #windows Icon, #windows Image {
-        dock: top;
-    }
-    
-    #windows Window {
+        
+        visibility: hidden;
         layer: foreground;
+        
+        layout: grid;
+        grid-size: 5 5;
     }
     
-    Icon {
+    Window {
+        layer: window;
+        visibility: visible;
+    }
+    
+    #windows Icon {
         layer: foreground;
     }
     
@@ -229,14 +237,15 @@ class Desktop(Screen):
         
         window_bar_windows = []
         
-        with self.windows:            
-            yield image.Image(get_user_background(self.logged_in_user), (bounds.columns, (bounds.lines*2)-9), id="desktop-background")
+        yield image.Image(get_user_background(self.logged_in_user), (bounds.columns, (bounds.lines*2)-9), id="desktop-background")
+        with self.windows:
             
             for file in os.listdir(f"home/{self.logged_in_user}/Desktop"):
                 path = os.path.join(f"home/{self.logged_in_user}/Desktop", file)
                 
                 new_icon = icon.Icon(path, file, get_file_icon(file))
                 yield new_icon
+            
             
             ready_result = self.on_ready(self)
             if ready_result:
