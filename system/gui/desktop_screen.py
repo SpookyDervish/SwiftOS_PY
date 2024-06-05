@@ -34,7 +34,7 @@ class Desktop(Screen):
         layer: foreground;
         
         layout: grid;
-        grid-size: 5 5;
+        grid-size: 15 1;
     }
     
     Window {
@@ -44,6 +44,7 @@ class Desktop(Screen):
     
     #windows Icon {
         layer: foreground;
+        margin-top: 1;
     }
     
     #window-bar {
@@ -262,5 +263,7 @@ class Desktop(Screen):
             for win in window_bar_windows:
                 yield self.add_to_window_bar(win, tabs)
                 
-
+        self.windows.styles.grid_size_columns = int(bounds.columns/11)
+        self.windows.styles.grid_size_rows = int(bounds.lines/9)
+            
         self.app.log("Desktop ready!")

@@ -130,6 +130,11 @@ class NotepadWindow(window.Window):
             if answer == "Yes": # Save the changes
                 with open(self.open_file, "w") as f:
                     f.write(text_area.text)
+                    
+            text_area.text = ""
+            self.unsaved_changes = True
+            
+            await self.screen.change_window_name(self, "Notepad | New File", window_bar)
         
         if self.unsaved_changes:
             await create_dialog("You have unsaved changes! Would you like to save them?", self.screen, "New file", buttons=DialogButtons.YES_NO, icon=DialogIcon.QUESTION, callback=unsaved_changes_dialog)

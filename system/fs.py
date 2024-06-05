@@ -40,7 +40,7 @@ def get_file_icon(file_path: str):
         else:
             return icons["/folder\\"]
     
-def run(app_path: str, desktop, args: list[str]):
+async def run(app_path: str, desktop, args: list[str]):
     name = os.path.basename(app_path)[:-3]
     path = os.path.abspath(app_path)
 
@@ -55,9 +55,9 @@ def run(app_path: str, desktop, args: list[str]):
         )
         return 1
     
-    return app.execute(desktop, args)
+    await app.execute(desktop, args)
     
-def open_file(file_path: str, desktop):    
+async def open_file(file_path: str, desktop):    
     current_user = desktop.logged_in_user
     
     user_details = get_user_details(current_user)
@@ -74,7 +74,7 @@ def open_file(file_path: str, desktop):
     try:
         default_app = apps[ext]
     except KeyError: # There is no default app to handle this file extension...
-        create_dialog(
+        await create_dialog(
             "There is no default app to handle this kind of file. Support for changing default apps will be coming in a future release of SwiftOS. We apolagize for the inconvenicence.",
             desktop,
             "SwiftOS Error",
@@ -82,4 +82,4 @@ def open_file(file_path: str, desktop):
         )
         return False
     
-    return run(default_app, desktop, [file_path])
+    await run(default_app, desktop, [file_path])

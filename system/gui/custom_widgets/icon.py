@@ -19,7 +19,6 @@ class Icon(Widget):
         
         width: 11;
         height: 8;
-        margin: 1;
     }
         
     Icon Static {
@@ -70,7 +69,7 @@ class Icon(Widget):
                     self.remove()
             
             text = f"Couldn't find the file \"{self.file}\", would you like to delete the Shortcut?"
-            dialog.create_dialog(text, self.screen, title="SwiftOS Error", buttons=dialog.DialogButtons.YES_NO, icon=dialog.DialogIcon.EXCLAMATION, callback=callback)
+            await dialog.create_dialog(text, self.screen, title="SwiftOS Error", buttons=dialog.DialogButtons.YES_NO, icon=dialog.DialogIcon.EXCLAMATION, callback=callback)
             
         await open_file(self.file, self.screen)
         
