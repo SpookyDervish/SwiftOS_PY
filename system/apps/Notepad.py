@@ -10,6 +10,12 @@ from textual.widgets import TextArea, Footer, Static, DirectoryTree
 from textual.containers import VerticalScroll
 from textual.binding import Binding
 
+from textual_fspicker import FileSave
+
+from textual import work
+
+from system.gui.custom_widgets.dialog import create_dialog, DialogButtons, DialogIcon
+
 class NotepadWindow(window.Window):    
     DEFAULT_CSS = """
     #tree-view {
@@ -41,8 +47,32 @@ class NotepadWindow(window.Window):
                 "Failed to save file!",
                 icon=dialog.DialogIcon.CRITICAL
             )
+            
+    async def action_save_as(self):
+        text_area = self.query_one(TextArea)
+        chosen_file = None
+        
+        def save_dialog(answer):
+            if answer == "Yes" and chosen_file:
+                with open(str(chosen_file), "w") as f:
+                    f.write(text_area.text)
+        
+        async def on_save(file):
+            nonlocal chosen_file
+            chosen_file = file
+            
+            if chosen_file: # If the user didn't press "Cancel"
+                if os.path.isfile(chosen_file): # If the user chose an existing file
+                    await create_dialog("This file already exists! Do you want to overwrite it?", self.screen, "Save as", buttons=DialogButtons.YES_NO, icon=DialogIcon.QUESTION, callback=save_dialog)
+                else:
+                    with open(str(chosen_file), "w") as f:
+                        f.write(text_area.text)
+                
+        
+        file_save_dialog = FileSave()
+        await self.app.push_screen(file_save_dialog, callback=on_save)
     
-    def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected):
+    """def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected):
         event.stop()
         code_view = self.query_one("#code-view", TextArea)
         
@@ -64,7 +94,7 @@ class NotepadWindow(window.Window):
         code_view.text = contents
         code_view.language = self.file_path_to_lang(self.open_file)
         
-        #self.set_title(str(os.path.basename(event.path)))
+        #self.set_title(str(os.path.basename(event.path)))"""
     
     def file_path_to_lang(self, file_path: str):
         ext = get_file_extension(file_path)
@@ -108,7 +138,7 @@ class NotepadWindow(window.Window):
                 ext = self.file_path_to_lang(self.ARGS[0])
         
         path = os.getcwd() if len(self.ARGS) < 1 else os.path.dirname(self.open_file)
-        yield DirectoryTree(path, id="tree-view")
+        #yield DirectoryTree(path, id="tree-view")
         
         with VerticalScroll():
             yield TextArea(TEXT, language=ext, theme="dracula", show_line_numbers=True, soft_wrap=False, id="code-view")

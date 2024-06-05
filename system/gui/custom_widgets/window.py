@@ -6,16 +6,13 @@ from textual.widgets import Static, Button
 from textual import events, on, work
 from textual.css.scalar import ScalarOffset, Scalar, Unit
 
-from string import ascii_letters
-from secrets import choice
 from time import sleep
 
 from system.console import console_bounds
+from system.util.rand_str import generate_random_string
 
 
-def generate_random_string(length: int):
-    characters = ascii_letters
-    return ''.join(choice(characters) for _ in range(length))
+
 
 class Window(Vertical):
     DEFAULT_CSS = """

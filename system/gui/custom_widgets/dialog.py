@@ -167,7 +167,7 @@ class Dialog(Window):
             
         
             
-def create_dialog(message: str, desktop, title: str = "Message", buttons: DialogButtons = DialogButtons.OK, icon: DialogIcon = DialogIcon.INFO, callback = None):
+async def create_dialog(message: str, desktop, title: str = "Message", buttons: DialogButtons = DialogButtons.OK, icon: DialogIcon = DialogIcon.INFO, callback = None):
     dialog = Dialog(
         message=message,
         title=title,
@@ -181,6 +181,6 @@ def create_dialog(message: str, desktop, title: str = "Message", buttons: Dialog
     
     windows.mount(dialog)
     
-    desktop.add_to_window_bar(dialog, window_bar)
+    await desktop.add_to_window_bar(dialog, window_bar)
     
     return dialog

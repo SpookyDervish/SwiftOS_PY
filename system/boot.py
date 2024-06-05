@@ -5,6 +5,7 @@ import time
 from textual import work
 from textual.app import ComposeResult
 from textual.widgets import Static, Footer
+from textual_fspicker import FileOpen
 
 from configparser import ConfigParser
 
@@ -15,6 +16,7 @@ from system.gui.custom_widgets.window import Window
 from system.gui.desktop_screen import Desktop
 from system.users import get_valid_users, get_user_details
 from system import fs
+from system.proc_manager import ProcessManager, Process
 from main import SwiftOS
 
 
@@ -78,8 +80,11 @@ async def boot(app : SwiftOS, ini_path: str):
     desktop = Desktop(logged_in_user)
     desktop.on_ready = on_ready
     
+    app.log("Starting process manager..")
+    process_manager = ProcessManager(desktop)
+    
     app.pop_screen()
-    app.push_screen(desktop)
+    await app.push_screen(desktop)
 
     app.log("Cleaning up..")
     
